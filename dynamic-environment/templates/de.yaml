@@ -1,0 +1,27 @@
+apiVersion: riskified.com/v1alpha1
+kind: DynamicEnv
+metadata:
+  name: {{ .Release.Name }}
+spec:
+  istioMatches:
+    - headers:
+        x-dynamicenv:
+          exact: "{{ .Values.DYNAMICENV_HEADER_VALUE }}"
+
+  subsets:
+    - name: "ServiceB"
+      containers:
+        - containerName: server
+          image: "registry.com/riskified/serviceB:{{ .Values.serviceB.image.tag }}"
+          env:
+            - name: DB_HOST
+              value: {{ tpl .Values.POSTGRESQL_HOST . }}
+    - name: "ServiceC"
+       containers:
+        - containerName: server
+          image: "registry.com/riskified/serviceC:{{ .Values.serviceC.image.tag }}"
+          env:
+            - name: S3_ENDPOINT
+       value: {{ tpl .Values.LOCALSTACK_HOST . }}
+     - name: SQS_ENDPOINT
+       value: {{ tpl .Values.LOCALSTACK_HOST . }}

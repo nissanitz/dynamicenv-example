@@ -1,0 +1,26 @@
+DYNAMICENV_HEADER_VALUE: team-2-de-sdfsd4
+
+serviceB:
+  image:
+         tag: service-b-image:9087dc3
+serviceC:
+  image:
+         tag: service-c-image:32rwsra
+
+POSTGRESQL_HOST: "{{ .Release.Name }}-postgresql"
+postgresql:
+  persistence:
+    enabled: true
+    mountPath: /riski-data/postgres
+    size: 50Gi
+    snapshotName: pg-snapshot
+
+LOCALSTACK_HOST: "http://{{ .Release.Name }}-localstack:4566"
+localstack:
+  startServices: sqs,s3
+  enableStartupScripts: true
+  startupScriptContent: |
+    awslocal sqs create-queue --queue-name async_notifications
+    awslocal sqs create-queue --queue-name order_events
+
+    awslocal s3api create-bucket --bucket orders
